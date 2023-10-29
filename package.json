@@ -1,36 +1,47 @@
 {
-    "name": "@vscode/textbuffer",
-    "version": "1.0.0",
-    "description": "The underling text buffer used in VS Code/Monaco",
-    "main": "lib/index.js",
-    "types": "lib/index.d.ts",
-    "scripts": {
-        "start": "npm run build && npm run watch",
-        "build": "tsc",
-        "watch": "tsc -w",
-        "pretest": "npm run build",
-        "test": "jest --forceExit",
-        "fasttest": "jest --forceExit"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/microsoft/vscode-textbuffer.git"
-    },
-    "author": "Visual Studio Code Team",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/microsoft/vscode-textbuffer/issues"
-    },
-    "homepage": "httpshttps://github.com/microsoft/vscode-textbuffer#readme",
-    "devDependencies": {
-        "@types/jest": "29.5.6",
-        "jest": "29.7.0",
-        "kind-of": ">=6.0.3",
-        "minimist": ">=1.2.8",
-        "node-notifier": ">=10.0.1",
-        "set-value": ">=4.1.0",
-        "ts-jest": "29.1.1",
-        "typescript": "5.2.2",
-        "yargs-parser": ">=21.1.1"
-    }
+  "name": "@vscode/textbuffer",
+  "version": "0.0.1",
+  "description": "The underling text buffer used in VS Code/Monaco",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "start": "npm run build && npm run watch",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "pretest": "npm run build",
+    "test": "jest --forceExit",
+    "fasttest": "jest --forceExit",
+    "prepublishOnly": "TypeScriptESBuild Source/**/*.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodeEditorLand/CodeEditorLand.git"
+  },
+  "author": {
+    "name": "Nikola Hristov",
+    "email": "nikola@nikolahristov.tech",
+    "url": "https://nikolahristov.tech"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CodeEditorLand/CodeEditorLand/issues"
+  },
+  "homepage": "https://github.com/CodeEditorLand/CodeEditorLand#readme",
+  "devDependencies": {
+    "@types/jest": "29.5.6",
+    "jest": "29.7.0",
+    "kind-of": ">=6.0.3",
+    "minimist": ">=1.2.8",
+    "node-notifier": ">=10.0.1",
+    "set-value": ">=4.1.0",
+    "ts-jest": "29.1.1",
+    "typescript": "5.2.2",
+    "yargs-parser": ">=21.1.1",
+    "typescript-esbuild": "0.3.1"
+  },
+  "type": "module",
+  "private": "false",
+  "publishConfig": {
+    "access": "public"
+  }
 }
