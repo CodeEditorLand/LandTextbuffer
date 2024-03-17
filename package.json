@@ -1,9 +1,25 @@
 {
-  "author": "Visual Studio Code Team",
+  "name": "@vscode/textbuffer",
+  "version": "1.0.0",
+  "description": "The underling text buffer used in VS Code/Monaco",
+  "homepage": "httpshttps://github.com/microsoft/vscode-textbuffer#readme",
   "bugs": {
     "url": "https://github.com/microsoft/vscode-textbuffer/issues"
   },
-  "description": "The underling text buffer used in VS Code/Monaco",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/microsoft/vscode-textbuffer.git"
+  },
+  "license": "MIT",
+  "author": "Visual Studio Code Team",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "fasttest": "jest --forceExit",
+    "start": "npm run build && npm run watch",
+    "watch": "tsc -w"
+  },
   "devDependencies": {
     "@types/jest": "24.0.13",
     "jest": "27.0.6",
@@ -14,21 +30,5 @@
     "ts-jest": "27.0.5",
     "typescript": "3.4.2",
     "yargs-parser": ">=13.1.2"
-  },
-  "homepage": "httpshttps://github.com/microsoft/vscode-textbuffer#readme",
-  "license": "MIT",
-  "main": "lib/index.js",
-  "name": "@vscode/textbuffer",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/microsoft/vscode-textbuffer.git"
-  },
-  "scripts": {
-    "build": "tsc",
-    "fasttest": "jest --forceExit",
-    "start": "npm run build && npm run watch",
-    "watch": "tsc -w"
-  },
-  "types": "lib/index.d.ts",
-  "version": "1.0.0"
+  }
 }
