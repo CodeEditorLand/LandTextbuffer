@@ -2,26 +2,26 @@
     "name": "@vscode/textbuffer",
     "version": "1.0.0",
     "description": "The underling text buffer used in VS Code/Monaco",
-    "homepage": "httpshttps://github.com/microsoft/vscode-textbuffer#readme",
-    "bugs": {
-        "url": "https://github.com/microsoft/vscode-textbuffer/issues"
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "scripts": {
+        "start": "npm run build && npm run watch",
+        "build": "tsc",
+        "watch": "tsc -w",
+        "pretest": "npm run build",
+        "test": "jest --forceExit",
+        "fasttest": "jest --forceExit"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/microsoft/vscode-textbuffer.git"
     },
-    "license": "MIT",
     "author": "Visual Studio Code Team",
-    "main": "lib/index.js",
-    "types": "lib/index.d.ts",
-    "scripts": {
-        "build": "tsc",
-        "fasttest": "jest --forceExit",
-        "start": "npm run build && npm run watch",
-        "pretest": "npm run build",
-        "test": "jest --forceExit",
-        "watch": "tsc -w"
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/microsoft/vscode-textbuffer/issues"
     },
+    "homepage": "httpshttps://github.com/microsoft/vscode-textbuffer#readme",
     "devDependencies": {
         "@types/jest": "^24.0.13",
         "jest": "^27.0.6",
