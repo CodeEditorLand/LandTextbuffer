@@ -1,36 +1,45 @@
 {
-    "name": "@vscode/textbuffer",
-    "version": "1.0.0",
-    "description": "The underling text buffer used in VS Code/Monaco",
-    "main": "lib/index.js",
-    "types": "lib/index.d.ts",
-    "scripts": {
-        "start": "npm run build && npm run watch",
-        "build": "tsc",
-        "watch": "tsc -w",
-        "pretest": "npm run build",
-        "test": "jest --forceExit",
-        "fasttest": "jest --forceExit"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/microsoft/vscode-textbuffer.git"
-    },
-    "author": "Visual Studio Code Team",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/microsoft/vscode-textbuffer/issues"
-    },
-    "homepage": "httpshttps://github.com/microsoft/vscode-textbuffer#readme",
-    "devDependencies": {
-        "@types/jest": "29.5.12",
-        "jest": "29.7.0",
-        "kind-of": ">=6.0.3",
-        "minimist": ">=1.2.8",
-        "node-notifier": ">=10.0.1",
-        "set-value": ">=4.1.0",
-        "ts-jest": "29.1.2",
-        "typescript": "5.4.2",
-        "yargs-parser": ">=21.1.1"
-    }
+	"name": "@vscode/textbuffer",
+	"version": "0.0.1",
+	"private": false,
+	"description": "The underling text buffer used in VS Code/Monaco",
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
+	},
+	"type": "module",
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
+	"scripts": {
+		"build": "tsc",
+		"fasttest": "jest --forceExit",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
+		"start": "npm run build && npm run watch",
+		"watch": "tsc -w"
+	},
+	"devDependencies": {
+		"@types/jest": "29.5.12",
+		"jest": "29.7.0",
+		"kind-of": ">=6.0.3",
+		"minimist": ">=1.2.8",
+		"node-notifier": ">=10.0.1",
+		"set-value": ">=4.1.0",
+		"ts-jest": "29.1.2",
+		"typescript": "5.4.2",
+		"typescript-esbuild": "latest",
+		"yargs-parser": ">=21.1.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
 }
