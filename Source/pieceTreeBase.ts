@@ -237,7 +237,6 @@ class PieceTreeSearchCache {
 		if (this._cache.length >= this._limit) {
 			this._cache.shift();
 		}
-
 		this._cache.push(nodePosition);
 	}
 
@@ -779,7 +778,6 @@ export class PieceTreeBase {
 		for (let k = newPieces.length - 2; k >= 0; k--) {
 			newNode = this.rbInsertLeft(newNode, newPieces[k]);
 		}
-
 		this.validateCRLFWithPrevNode(newNode);
 		this.deleteNodes(nodesToDel);
 	}
