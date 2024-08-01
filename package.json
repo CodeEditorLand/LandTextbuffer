@@ -2,10 +2,10 @@
 	"description": "The underling text buffer used in VS Code/Monaco",
 	"devDependencies": {
 		"kind-of": ">=6.0.3",
-		"minimist": ">=0.2.1",
-		"node-notifier": ">=8.0.1",
-		"set-value": ">=2.0.1",
-		"yargs-parser": ">=13.1.2"
+		"minimist": ">=1.2.8",
+		"node-notifier": ">=10.0.1",
+		"set-value": ">=4.1.0",
+		"yargs-parser": ">=21.1.1"
 	},
 	"main": "lib/index.js",
 	"name": "@vscode/textbuffer",
