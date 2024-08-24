@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Piece, PieceTreeBase } from './pieceTreeBase';
+import { Piece, PieceTreeBase } from "./pieceTreeBase";
 
 export class TreeNode {
 	parent: TreeNode;
@@ -196,7 +196,7 @@ export function rbDelete(tree: PieceTreeBase, z: TreeNode) {
 		return;
 	}
 
-	let yWasRed = (y.color === NodeColor.Red);
+	let yWasRed = y.color === NodeColor.Red;
 
 	if (y === y.parent.left) {
 		y.parent.left = x;
@@ -250,7 +250,10 @@ export function rbDelete(tree: PieceTreeBase, z: TreeNode) {
 	if (x.parent.left === x) {
 		let newSizeLeft = calculateSize(x);
 		let newLFLeft = calculateLF(x);
-		if (newSizeLeft !== x.parent.size_left || newLFLeft !== x.parent.lf_left) {
+		if (
+			newSizeLeft !== x.parent.size_left ||
+			newLFLeft !== x.parent.lf_left
+		) {
 			let delta = newSizeLeft - x.parent.size_left;
 			let lf_delta = newLFLeft - x.parent.lf_left;
 			x.parent.size_left = newSizeLeft;
@@ -279,7 +282,10 @@ export function rbDelete(tree: PieceTreeBase, z: TreeNode) {
 				w = x.parent.right;
 			}
 
-			if (w.left.color === NodeColor.Black && w.right.color === NodeColor.Black) {
+			if (
+				w.left.color === NodeColor.Black &&
+				w.right.color === NodeColor.Black
+			) {
 				w.color = NodeColor.Red;
 				x = x.parent;
 			} else {
@@ -306,10 +312,12 @@ export function rbDelete(tree: PieceTreeBase, z: TreeNode) {
 				w = x.parent.left;
 			}
 
-			if (w.left.color === NodeColor.Black && w.right.color === NodeColor.Black) {
+			if (
+				w.left.color === NodeColor.Black &&
+				w.right.color === NodeColor.Black
+			) {
 				w.color = NodeColor.Red;
 				x = x.parent;
-
 			} else {
 				if (w.left.color === NodeColor.Black) {
 					w.right.color = NodeColor.Black;
@@ -375,7 +383,12 @@ export function fixInsert(tree: PieceTreeBase, x: TreeNode) {
 	tree.root.color = NodeColor.Black;
 }
 
-export function updateTreeMetadata(tree: PieceTreeBase, x: TreeNode, delta: number, lineFeedCntDelta: number): void {
+export function updateTreeMetadata(
+	tree: PieceTreeBase,
+	x: TreeNode,
+	delta: number,
+	lineFeedCntDelta: number,
+): void {
 	// node length change or line feed count change
 	while (x !== tree.root && x !== SENTINEL) {
 		if (x.parent.left === x) {
