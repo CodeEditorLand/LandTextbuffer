@@ -25,12 +25,14 @@ export const AverageBufferSize = 65535;
 
 export function createUintArray(arr: number[]): Uint32Array | Uint16Array {
 	let r;
+
 	if (arr[arr.length - 1] < 65536) {
 		r = new Uint16Array(arr.length);
 	} else {
 		r = new Uint32Array(arr.length);
 	}
 	r.set(arr, 0);
+
 	return r;
 }
 
@@ -77,11 +79,15 @@ export function createLineStartsFast(
 export function createLineStarts(r: number[], str: string): LineStarts {
 	r.length = 0;
 	r[0] = 0;
+
 	let rLength = 1;
+
 	let cr = 0,
 		lf = 0,
 		crlf = 0;
+
 	let isBasicASCII = true;
+
 	for (let i = 0, len = str.length; i < len; i++) {
 		const chr = str.charCodeAt(i);
 
@@ -197,6 +203,7 @@ class PieceTreeSnapshot implements ITextSnapshot {
 		this._tree = tree;
 		this._BOM = BOM;
 		this._index = 0;
+
 		if (tree.root !== SENTINEL) {
 			tree.iterate(tree.root, (node) => {
 				if (node !== SENTINEL) {
@@ -211,6 +218,7 @@ class PieceTreeSnapshot implements ITextSnapshot {
 		if (this._pieces.length === 0) {
 			if (this._index === 0) {
 				this._index++;
+
 				return this._BOM;
 			} else {
 				return null;
@@ -249,6 +257,7 @@ class PieceTreeSearchCache {
 	public get(offset: number): CacheEntry | null {
 		for (let i = this._cache.length - 1; i >= 0; i--) {
 			let nodePos = this._cache[i];
+
 			if (
 				nodePos.nodeStartOffset <= offset &&
 				nodePos.nodeStartOffset + nodePos.node.piece.length >= offset
@@ -266,6 +275,7 @@ class PieceTreeSearchCache {
 	} | null {
 		for (let i = this._cache.length - 1; i >= 0; i--) {
 			let nodePos = this._cache[i];
+
 			if (
 				nodePos.nodeStartLineNumber &&
 				nodePos.nodeStartLineNumber < lineNumber &&
@@ -293,21 +303,26 @@ class PieceTreeSearchCache {
 
 	public valdiate(offset: number) {
 		let hasInvalidVal = false;
+
 		let tmp: Array<CacheEntry | null> = this._cache;
+
 		for (let i = 0; i < tmp.length; i++) {
 			let nodePos = tmp[i]!;
+
 			if (
 				nodePos.node.parent === null ||
 				nodePos.nodeStartOffset >= offset
 			) {
 				tmp[i] = null;
 				hasInvalidVal = true;
+
 				continue;
 			}
 		}
 
 		if (hasInvalidVal) {
 			let newArr: CacheEntry[] = [];
+
 			for (const entry of tmp) {
 				if (entry !== null) {
 					newArr.push(entry);
@@ -350,6 +365,7 @@ export class PieceTreeBase {
 		this._EOLNormalized = eolNormalized;
 
 		let lastNode: TreeNode | null = null;
+
 		for (let i = 0, len = chunks.length; i < len; i++) {
 			if (chunks[i].buffer.length > 0) {
 				if (!chunks[i].lineStarts) {
@@ -384,19 +400,26 @@ export class PieceTreeBase {
 
 	normalizeEOL(eol: "\r\n" | "\n") {
 		let averageBufferSize = AverageBufferSize;
+
 		let min = averageBufferSize - Math.floor(averageBufferSize / 3);
+
 		let max = min * 2;
 
 		let tempChunk = "";
+
 		let tempChunkLen = 0;
+
 		let chunks: StringBuffer[] = [];
 
 		this.iterate(this.root, (node) => {
 			let str = this.getNodeContent(node);
+
 			let len = str.length;
+
 			if (tempChunkLen <= min || tempChunkLen + len < max) {
 				tempChunk += str;
 				tempChunkLen += len;
+
 				return true;
 			}
 
@@ -405,6 +428,7 @@ export class PieceTreeBase {
 			chunks.push(new StringBuffer(text, createLineStartsFast(text)));
 			tempChunk = str;
 			tempChunkLen = len;
+
 			return true;
 		});
 
@@ -440,14 +464,19 @@ export class PieceTreeBase {
 		}
 
 		let offset = 0;
+
 		let ret = this.iterate(this.root, (node) => {
 			if (node === SENTINEL) {
 				return true;
 			}
 			let str = this.getNodeContent(node);
+
 			let len = str.length;
+
 			let startPosition = other.nodeAt(offset);
+
 			let endPosition = other.nodeAt(offset + len);
+
 			let val = other.getValueInRange2(startPosition, endPosition);
 
 			return str === val;
@@ -471,6 +500,7 @@ export class PieceTreeBase {
 					x,
 					lineNumber - x.lf_left - 2,
 				);
+
 				return (leftLen += accumualtedValInCurrentIndex + column - 1);
 			} else {
 				lineNumber -= x.lf_left + x.piece.lineFeedCnt;
@@ -487,7 +517,9 @@ export class PieceTreeBase {
 		offset = Math.max(0, offset);
 
 		let x = this.root;
+
 		let lfCnt = 0;
+
 		let originalOffset = offset;
 
 		while (x !== SENTINEL) {
@@ -500,7 +532,9 @@ export class PieceTreeBase {
 
 				if (out.index === 0) {
 					let lineStartOffset = this.getOffsetAt(lfCnt + 1, 1);
+
 					let column = originalOffset - lineStartOffset;
+
 					return new Position(lfCnt + 1, column + 1);
 				}
 
@@ -512,7 +546,9 @@ export class PieceTreeBase {
 				if (x.right === SENTINEL) {
 					// last node
 					let lineStartOffset = this.getOffsetAt(lfCnt + 1, 1);
+
 					let column = originalOffset - offset - lineStartOffset;
+
 					return new Position(lfCnt + 1, column + 1);
 				} else {
 					x = x.right;
@@ -535,9 +571,11 @@ export class PieceTreeBase {
 			range.startLineNumber,
 			range.startColumn,
 		);
+
 		let endPosition = this.nodeAt2(range.endLineNumber, range.endColumn);
 
 		let value = this.getValueInRange2(startPosition, endPosition);
+
 		if (eol) {
 			if (eol !== this._EOL || !this._EOLNormalized) {
 				return value.replace(/\r\n|\r|\n/g, eol);
@@ -559,11 +597,14 @@ export class PieceTreeBase {
 	): string {
 		if (startPosition.node === endPosition.node) {
 			let node = startPosition.node;
+
 			let buffer = this._buffers[node.piece.bufferIndex].buffer;
+
 			let startOffset = this.offsetInBuffer(
 				node.piece.bufferIndex,
 				node.piece.start,
 			);
+
 			return buffer.substring(
 				startOffset + startPosition.remainder,
 				startOffset + endPosition.remainder,
@@ -571,19 +612,24 @@ export class PieceTreeBase {
 		}
 
 		let x = startPosition.node;
+
 		let buffer = this._buffers[x.piece.bufferIndex].buffer;
+
 		let startOffset = this.offsetInBuffer(
 			x.piece.bufferIndex,
 			x.piece.start,
 		);
+
 		let ret = buffer.substring(
 			startOffset + startPosition.remainder,
 			startOffset + x.piece.length,
 		);
 
 		x = x.next();
+
 		while (x !== SENTINEL) {
 			let buffer = this._buffers[x.piece.bufferIndex].buffer;
+
 			let startOffset = this.offsetInBuffer(
 				x.piece.bufferIndex,
 				x.piece.start,
@@ -594,6 +640,7 @@ export class PieceTreeBase {
 					startOffset,
 					startOffset + endPosition.remainder,
 				);
+
 				break;
 			} else {
 				ret += buffer.substr(startOffset, x.piece.length);
@@ -645,25 +692,31 @@ export class PieceTreeBase {
 
 	public getLineCharCode(lineNumber: number, index: number): number {
 		let nodePos = this.nodeAt2(lineNumber, index + 1);
+
 		if (nodePos.remainder === nodePos.node.piece.length) {
 			// the char we want to fetch is at the head of next node.
 			let matchingNode = nodePos.node.next();
+
 			if (!matchingNode) {
 				return 0;
 			}
 
 			let buffer = this._buffers[matchingNode.piece.bufferIndex];
+
 			let startOffset = this.offsetInBuffer(
 				matchingNode.piece.bufferIndex,
 				matchingNode.piece.start,
 			);
+
 			return buffer.buffer.charCodeAt(startOffset);
 		} else {
 			let buffer = this._buffers[nodePos.node.piece.bufferIndex];
+
 			let startOffset = this.offsetInBuffer(
 				nodePos.node.piece.bufferIndex,
 				nodePos.node.piece.start,
 			);
+
 			let targetOffset = startOffset + nodePos.remainder;
 
 			return buffer.buffer.charCodeAt(targetOffset);
@@ -673,6 +726,7 @@ export class PieceTreeBase {
 	public getLineLength(lineNumber: number): number {
 		if (lineNumber === this.getLineCount()) {
 			let startOffset = this.getOffsetAt(lineNumber, 1);
+
 			return this.getLength() - startOffset;
 		}
 		return (
@@ -696,9 +750,13 @@ export class PieceTreeBase {
 
 		if (this.root !== SENTINEL) {
 			let { node, remainder, nodeStartOffset } = this.nodeAt(offset);
+
 			let piece = node.piece;
+
 			let bufferIndex = piece.bufferIndex;
+
 			let insertPosInBuffer = this.positionInBuffer(node, remainder);
+
 			if (
 				node.piece.bufferIndex === 0 &&
 				piece.end.line === this._lastChangeBufferPos.line &&
@@ -709,6 +767,7 @@ export class PieceTreeBase {
 				// changed buffer
 				this.appendToNode(node, value);
 				this.computeBufferMetadata();
+
 				return;
 			}
 
@@ -718,6 +777,7 @@ export class PieceTreeBase {
 			} else if (nodeStartOffset + node.piece.length > offset) {
 				// we are inserting into the middle of a node.
 				let nodesToDel: TreeNode[] = [];
+
 				let newRightPiece = new Piece(
 					piece.bufferIndex,
 					insertPosInBuffer,
@@ -758,6 +818,7 @@ export class PieceTreeBase {
 				// reuse node for content before insertion point.
 				if (this.shouldCheckCRLF() && this.startWithLF(value)) {
 					let tailOfLeft = this.nodeCharCodeAt(node, remainder - 1);
+
 					if (tailOfLeft === 13 /** \r */) {
 						let previousPos = this.positionInBuffer(
 							node,
@@ -777,11 +838,13 @@ export class PieceTreeBase {
 				}
 
 				let newPieces = this.createNewPieces(value);
+
 				if (newRightPiece.length > 0) {
 					this.rbInsertRight(node, newRightPiece);
 				}
 
 				let tmpNode = node;
+
 				for (let k = 0; k < newPieces.length; k++) {
 					tmpNode = this.rbInsertRight(tmpNode, newPieces[k]);
 				}
@@ -792,6 +855,7 @@ export class PieceTreeBase {
 		} else {
 			// insert new node
 			let pieces = this.createNewPieces(value);
+
 			let node = this.rbInsertLeft(null, pieces[0]);
 
 			for (let k = 1; k < pieces.length; k++) {
@@ -812,8 +876,11 @@ export class PieceTreeBase {
 		}
 
 		let startPosition = this.nodeAt(offset);
+
 		let endPosition = this.nodeAt(offset + cnt);
+
 		let startNode = startPosition.node;
+
 		let endNode = endPosition.node;
 
 		if (startNode === endNode) {
@@ -821,6 +888,7 @@ export class PieceTreeBase {
 				startNode,
 				startPosition.remainder,
 			);
+
 			let endSplitPosInBuffer = this.positionInBuffer(
 				startNode,
 				endPosition.remainder,
@@ -833,12 +901,14 @@ export class PieceTreeBase {
 					rbDelete(this, startNode);
 					this.validateCRLFWithPrevNode(next);
 					this.computeBufferMetadata();
+
 					return;
 				}
 				this.deleteNodeHead(startNode, endSplitPosInBuffer);
 				this._searchCache.valdiate(offset);
 				this.validateCRLFWithPrevNode(startNode);
 				this.computeBufferMetadata();
+
 				return;
 			}
 
@@ -849,6 +919,7 @@ export class PieceTreeBase {
 				this.deleteNodeTail(startNode, startSplitPosInBuffer);
 				this.validateCRLFWithNextNode(startNode);
 				this.computeBufferMetadata();
+
 				return;
 			}
 
@@ -859,6 +930,7 @@ export class PieceTreeBase {
 				endSplitPosInBuffer,
 			);
 			this.computeBufferMetadata();
+
 			return;
 		}
 
@@ -870,6 +942,7 @@ export class PieceTreeBase {
 		);
 		this.deleteNodeTail(startNode, startSplitPosInBuffer);
 		this._searchCache.valdiate(offset);
+
 		if (startNode.piece.length === 0) {
 			nodesToDel.push(startNode);
 		}
@@ -880,12 +953,14 @@ export class PieceTreeBase {
 			endPosition.remainder,
 		);
 		this.deleteNodeHead(endNode, endSplitPosInBuffer);
+
 		if (endNode.piece.length === 0) {
 			nodesToDel.push(endNode);
 		}
 
 		// delete nodes in between
 		let secondNode = startNode.next();
+
 		for (
 			let node = secondNode;
 			node !== SENTINEL && node !== endNode;
@@ -903,6 +978,7 @@ export class PieceTreeBase {
 	insertContentToNodeLeft(value: string, node: TreeNode) {
 		// we are inserting content to the beginning of node
 		let nodesToDel: TreeNode[] = [];
+
 		if (
 			this.shouldCheckCRLF() &&
 			this.endWithCR(value) &&
@@ -911,10 +987,12 @@ export class PieceTreeBase {
 			// move `\n` to new node.
 
 			let piece = node.piece;
+
 			let newStart: BufferCursor = {
 				line: piece.start.line + 1,
 				column: 0,
 			};
+
 			let nPiece = new Piece(
 				piece.bufferIndex,
 				newStart,
@@ -934,7 +1012,9 @@ export class PieceTreeBase {
 		}
 
 		let newPieces = this.createNewPieces(value);
+
 		let newNode = this.rbInsertLeft(node, newPieces[newPieces.length - 1]);
+
 		for (let k = newPieces.length - 2; k >= 0; k--) {
 			newNode = this.rbInsertLeft(newNode, newPieces[k]);
 		}
@@ -950,7 +1030,9 @@ export class PieceTreeBase {
 		}
 
 		let newPieces = this.createNewPieces(value);
+
 		let newNode = this.rbInsertRight(node, newPieces[0]);
+
 		let tmpNode = newNode;
 
 		for (let k = 1; k < newPieces.length; k++) {
@@ -972,7 +1054,9 @@ export class PieceTreeBase {
 		ret?: BufferCursor,
 	): BufferCursor | null {
 		let piece = node.piece;
+
 		let bufferIndex = node.piece.bufferIndex;
+
 		let lineStarts = this._buffers[bufferIndex].lineStarts;
 
 		let startOffset = lineStarts[piece.start.line] + piece.start.column;
@@ -981,10 +1065,13 @@ export class PieceTreeBase {
 
 		// binary search offset between startOffset and endOffset
 		let low = piece.start.line;
+
 		let high = piece.end.line;
 
 		let mid: number = 0;
+
 		let midStop: number = 0;
+
 		let midStart: number = 0;
 
 		while (low <= high) {
@@ -1009,6 +1096,7 @@ export class PieceTreeBase {
 		if (ret) {
 			ret.line = mid;
 			ret.column = offset - midStart;
+
 			return null;
 		}
 
@@ -1030,13 +1118,16 @@ export class PieceTreeBase {
 		}
 
 		let lineStarts = this._buffers[bufferIndex].lineStarts;
+
 		if (end.line === lineStarts.length - 1) {
 			// it means, there is no \n after end, otherwise, there will be one more lineStart.
 			return end.line - start.line;
 		}
 
 		let nextLineStartOffset = lineStarts[end.line + 1];
+
 		let endOffset = lineStarts[end.line] + end.column;
+
 		if (nextLineStartOffset > endOffset + 1) {
 			// there are more than 1 character after end, which means it can't be \n
 			return end.line - start.line;
@@ -1056,6 +1147,7 @@ export class PieceTreeBase {
 
 	offsetInBuffer(bufferIndex: number, cursor: BufferCursor): number {
 		let lineStarts = this._buffers[bufferIndex].lineStarts;
+
 		return lineStarts[cursor.line] + cursor.column;
 	}
 
@@ -1070,9 +1162,12 @@ export class PieceTreeBase {
 			// the content is large, operations like substring, charCode becomes slow
 			// so here we split it into smaller chunks, just like what we did for CR/LF normalization
 			let newPieces: Piece[] = [];
+
 			while (text.length > AverageBufferSize) {
 				const lastChar = text.charCodeAt(AverageBufferSize - 1);
+
 				let splitText;
+
 				if (
 					lastChar === CharCode.CarriageReturn ||
 					(lastChar >= 0xd800 && lastChar <= 0xdbff)
@@ -1122,9 +1217,11 @@ export class PieceTreeBase {
 		}
 
 		let startOffset = this._buffers[0].buffer.length;
+
 		const lineStarts = createLineStartsFast(text, false);
 
 		let start = this._lastChangeBufferPos;
+
 		if (
 			this._buffers[0].lineStarts[
 				this._buffers[0].lineStarts.length - 1
@@ -1161,9 +1258,13 @@ export class PieceTreeBase {
 		}
 
 		const endOffset = this._buffers[0].buffer.length;
+
 		let endIndex = this._buffers[0].lineStarts.length - 1;
+
 		let endColumn = endOffset - this._buffers[0].lineStarts[endIndex];
+
 		let endPos = { line: endIndex, column: endColumn };
+
 		let newPiece = new Piece(
 			0 /** todo@peng */,
 			start,
@@ -1172,6 +1273,7 @@ export class PieceTreeBase {
 			endOffset - startOffset,
 		);
 		this._lastChangeBufferPos = endPos;
+
 		return [newPiece];
 	}
 
@@ -1183,18 +1285,24 @@ export class PieceTreeBase {
 		let x = this.root;
 
 		let ret = "";
+
 		let cache = this._searchCache.get2(lineNumber);
+
 		if (cache) {
 			x = cache.node;
+
 			let prevAccumualtedValue = this.getAccumulatedValue(
 				x,
 				lineNumber - cache.nodeStartLineNumber - 1,
 			);
+
 			let buffer = this._buffers[x.piece.bufferIndex].buffer;
+
 			let startOffset = this.offsetInBuffer(
 				x.piece.bufferIndex,
 				x.piece.start,
 			);
+
 			if (
 				cache.nodeStartLineNumber + x.piece.lineFeedCnt ===
 				lineNumber
@@ -1208,6 +1316,7 @@ export class PieceTreeBase {
 					x,
 					lineNumber - cache.nodeStartLineNumber,
 				);
+
 				return buffer.substring(
 					startOffset + prevAccumualtedValue,
 					startOffset + accumualtedValue - endOffset,
@@ -1215,7 +1324,9 @@ export class PieceTreeBase {
 			}
 		} else {
 			let nodeStartOffset = 0;
+
 			const originalLineNumber = lineNumber;
+
 			while (x !== SENTINEL) {
 				if (x.left !== SENTINEL && x.lf_left >= lineNumber - 1) {
 					x = x.left;
@@ -1224,11 +1335,14 @@ export class PieceTreeBase {
 						x,
 						lineNumber - x.lf_left - 2,
 					);
+
 					let accumualtedValue = this.getAccumulatedValue(
 						x,
 						lineNumber - x.lf_left - 1,
 					);
+
 					let buffer = this._buffers[x.piece.bufferIndex].buffer;
+
 					let startOffset = this.offsetInBuffer(
 						x.piece.bufferIndex,
 						x.piece.start,
@@ -1250,7 +1364,9 @@ export class PieceTreeBase {
 						x,
 						lineNumber - x.lf_left - 2,
 					);
+
 					let buffer = this._buffers[x.piece.bufferIndex].buffer;
+
 					let startOffset = this.offsetInBuffer(
 						x.piece.bufferIndex,
 						x.piece.start,
@@ -1260,6 +1376,7 @@ export class PieceTreeBase {
 						startOffset + prevAccumualtedValue,
 						startOffset + x.piece.length,
 					);
+
 					break;
 				} else {
 					lineNumber -= x.lf_left + x.piece.lineFeedCnt;
@@ -1271,11 +1388,13 @@ export class PieceTreeBase {
 
 		// search in order, to find the node contains end column
 		x = x.next();
+
 		while (x !== SENTINEL) {
 			let buffer = this._buffers[x.piece.bufferIndex].buffer;
 
 			if (x.piece.lineFeedCnt > 0) {
 				let accumualtedValue = this.getAccumulatedValue(x, 0);
+
 				let startOffset = this.offsetInBuffer(
 					x.piece.bufferIndex,
 					x.piece.start,
@@ -1285,6 +1404,7 @@ export class PieceTreeBase {
 					startOffset,
 					startOffset + accumualtedValue - endOffset,
 				);
+
 				return ret;
 			} else {
 				let startOffset = this.offsetInBuffer(
@@ -1304,6 +1424,7 @@ export class PieceTreeBase {
 		let x = this.root;
 
 		let lfCnt = 1;
+
 		let len = 0;
 
 		while (x !== SENTINEL) {
@@ -1323,7 +1444,9 @@ export class PieceTreeBase {
 		accumulatedValue: number,
 	): { index: number; remainder: number } {
 		let piece = node.piece;
+
 		let pos = this.positionInBuffer(node, accumulatedValue);
+
 		let lineCnt = pos.line - piece.start.line;
 
 		if (
@@ -1337,6 +1460,7 @@ export class PieceTreeBase {
 				piece.start,
 				pos,
 			);
+
 			if (realLineCnt !== lineCnt) {
 				// aha yes, CRLF
 				return { index: realLineCnt, remainder: 0 };
@@ -1351,8 +1475,11 @@ export class PieceTreeBase {
 			return 0;
 		}
 		let piece = node.piece;
+
 		let lineStarts = this._buffers[piece.bufferIndex].lineStarts;
+
 		let expectedLineStartIndex = piece.start.line + index + 1;
+
 		if (expectedLineStartIndex > piece.end.line) {
 			return (
 				lineStarts[piece.end.line] +
@@ -1371,14 +1498,18 @@ export class PieceTreeBase {
 
 	deleteNodeTail(node: TreeNode, pos: BufferCursor) {
 		const piece = node.piece;
+
 		const originalLFCnt = piece.lineFeedCnt;
+
 		const originalEndOffset = this.offsetInBuffer(
 			piece.bufferIndex,
 			piece.end,
 		);
 
 		const newEnd = pos;
+
 		const newEndOffset = this.offsetInBuffer(piece.bufferIndex, newEnd);
+
 		const newLineFeedCnt = this.getLineFeedCnt(
 			piece.bufferIndex,
 			piece.start,
@@ -1386,7 +1517,9 @@ export class PieceTreeBase {
 		);
 
 		const lf_delta = newLineFeedCnt - originalLFCnt;
+
 		const size_delta = newEndOffset - originalEndOffset;
+
 		const newLength = piece.length + size_delta;
 
 		node.piece = new Piece(
@@ -1402,21 +1535,28 @@ export class PieceTreeBase {
 
 	deleteNodeHead(node: TreeNode, pos: BufferCursor) {
 		const piece = node.piece;
+
 		const originalLFCnt = piece.lineFeedCnt;
+
 		const originalStartOffset = this.offsetInBuffer(
 			piece.bufferIndex,
 			piece.start,
 		);
 
 		const newStart = pos;
+
 		const newLineFeedCnt = this.getLineFeedCnt(
 			piece.bufferIndex,
 			newStart,
 			piece.end,
 		);
+
 		const newStartOffset = this.offsetInBuffer(piece.bufferIndex, newStart);
+
 		const lf_delta = newLineFeedCnt - originalLFCnt;
+
 		const size_delta = originalStartOffset - newStartOffset;
+
 		const newLength = piece.length + size_delta;
 		node.piece = new Piece(
 			piece.bufferIndex,
@@ -1431,18 +1571,24 @@ export class PieceTreeBase {
 
 	shrinkNode(node: TreeNode, start: BufferCursor, end: BufferCursor) {
 		const piece = node.piece;
+
 		const originalStartPos = piece.start;
+
 		const originalEndPos = piece.end;
 
 		// old piece, originalStartPos, start
 		const oldLength = piece.length;
+
 		const oldLFCnt = piece.lineFeedCnt;
+
 		const newEnd = start;
+
 		const newLineFeedCnt = this.getLineFeedCnt(
 			piece.bufferIndex,
 			piece.start,
 			newEnd,
 		);
+
 		const newLength =
 			this.offsetInBuffer(piece.bufferIndex, start) -
 			this.offsetInBuffer(piece.bufferIndex, originalStartPos);
@@ -1485,9 +1631,12 @@ export class PieceTreeBase {
 			this.shouldCheckCRLF() &&
 			this.startWithLF(value) &&
 			this.endWithCR(node);
+
 		const startOffset = this._buffers[0].buffer.length;
 		this._buffers[0].buffer += value;
+
 		const lineStarts = createLineStartsFast(value, false);
+
 		for (let i = 0; i < lineStarts.length; i++) {
 			lineStarts[i] += startOffset;
 		}
@@ -1507,14 +1656,21 @@ export class PieceTreeBase {
 		this._buffers[0].lineStarts = (<number[]>(
 			this._buffers[0].lineStarts
 		)).concat(<number[]>lineStarts.slice(1));
+
 		const endIndex = this._buffers[0].lineStarts.length - 1;
+
 		const endColumn =
 			this._buffers[0].buffer.length -
 			this._buffers[0].lineStarts[endIndex];
+
 		const newEnd = { line: endIndex, column: endColumn };
+
 		const newLength = node.piece.length + value.length;
+
 		const oldLineFeedCnt = node.piece.lineFeedCnt;
+
 		const newLineFeedCnt = this.getLineFeedCnt(0, node.piece.start, newEnd);
+
 		const lf_delta = newLineFeedCnt - oldLineFeedCnt;
 
 		node.piece = new Piece(
@@ -1531,7 +1687,9 @@ export class PieceTreeBase {
 
 	nodeAt(offset: number): NodePosition {
 		let x = this.root;
+
 		let cache = this._searchCache.get(offset);
+
 		if (cache) {
 			return {
 				node: cache.node,
@@ -1547,12 +1705,14 @@ export class PieceTreeBase {
 				x = x.left;
 			} else if (x.size_left + x.piece.length >= offset) {
 				nodeStartOffset += x.size_left;
+
 				let ret = {
 					node: x,
 					remainder: offset - x.size_left,
 					nodeStartOffset,
 				};
 				this._searchCache.set(ret);
+
 				return ret;
 			} else {
 				offset -= x.size_left + x.piece.length;
@@ -1566,6 +1726,7 @@ export class PieceTreeBase {
 
 	nodeAt2(lineNumber: number, column: number): NodePosition {
 		let x = this.root;
+
 		let nodeStartOffset = 0;
 
 		while (x !== SENTINEL) {
@@ -1576,6 +1737,7 @@ export class PieceTreeBase {
 					x,
 					lineNumber - x.lf_left - 2,
 				);
+
 				let accumualtedValue = this.getAccumulatedValue(
 					x,
 					lineNumber - x.lf_left - 1,
@@ -1595,6 +1757,7 @@ export class PieceTreeBase {
 					x,
 					lineNumber - x.lf_left - 2,
 				);
+
 				if (prevAccumualtedValue + column - 1 <= x.piece.length) {
 					return {
 						node: x,
@@ -1603,6 +1766,7 @@ export class PieceTreeBase {
 					};
 				} else {
 					column -= x.piece.length - prevAccumualtedValue;
+
 					break;
 				}
 			} else {
@@ -1614,10 +1778,13 @@ export class PieceTreeBase {
 
 		// search in order, to find the node contains position.column
 		x = x.next();
+
 		while (x !== SENTINEL) {
 			if (x.piece.lineFeedCnt > 0) {
 				let accumualtedValue = this.getAccumulatedValue(x, 0);
+
 				let nodeStartOffset = this.offsetOfNode(x);
+
 				return {
 					node: x,
 					remainder: Math.min(column - 1, accumualtedValue),
@@ -1626,6 +1793,7 @@ export class PieceTreeBase {
 			} else {
 				if (x.piece.length >= column - 1) {
 					let nodeStartOffset = this.offsetOfNode(x);
+
 					return {
 						node: x,
 						remainder: column - 1,
@@ -1647,9 +1815,11 @@ export class PieceTreeBase {
 			return -1;
 		}
 		let buffer = this._buffers[node.piece.bufferIndex];
+
 		let newOffset =
 			this.offsetInBuffer(node.piece.bufferIndex, node.piece.start) +
 			offset;
+
 		return buffer.buffer.charCodeAt(newOffset);
 	}
 
@@ -1658,6 +1828,7 @@ export class PieceTreeBase {
 			return 0;
 		}
 		let pos = node.size_left;
+
 		while (node !== this.root) {
 			if (node.parent.right === node) {
 				pos += node.parent.size_left + node.parent.piece.length;
@@ -1686,14 +1857,19 @@ export class PieceTreeBase {
 		}
 
 		let piece = val.piece;
+
 		let lineStarts = this._buffers[piece.bufferIndex].lineStarts;
+
 		let line = piece.start.line;
+
 		let startOffset = lineStarts[line] + piece.start.column;
+
 		if (line === lineStarts.length - 1) {
 			// last line, so there is no line feed at the end of this line
 			return false;
 		}
 		let nextLineOffset = lineStarts[line + 1];
+
 		if (nextLineOffset > startOffset + 1) {
 			return false;
 		}
@@ -1718,6 +1894,7 @@ export class PieceTreeBase {
 	validateCRLFWithPrevNode(nextNode: TreeNode) {
 		if (this.shouldCheckCRLF() && this.startWithLF(nextNode)) {
 			let node = nextNode.prev();
+
 			if (this.endWithCR(node)) {
 				this.fixCRLF(node, nextNode);
 			}
@@ -1727,6 +1904,7 @@ export class PieceTreeBase {
 	validateCRLFWithNextNode(node: TreeNode) {
 		if (this.shouldCheckCRLF() && this.endWithCR(node)) {
 			let nextNode = node.next();
+
 			if (this.startWithLF(nextNode)) {
 				this.fixCRLF(node, nextNode);
 			}
@@ -1737,7 +1915,9 @@ export class PieceTreeBase {
 		let nodesToDel: TreeNode[] = [];
 		// update node
 		let lineStarts = this._buffers[prev.piece.bufferIndex].lineStarts;
+
 		let newEnd: BufferCursor;
+
 		if (prev.piece.end.column === 0) {
 			// it means, last line ends with \r, not \r\n
 			newEnd = {
@@ -1756,6 +1936,7 @@ export class PieceTreeBase {
 		}
 
 		const prevNewLength = prev.piece.length - 1;
+
 		const prevNewLFCnt = prev.piece.lineFeedCnt - 1;
 		prev.piece = new Piece(
 			prev.piece.bufferIndex,
@@ -1766,6 +1947,7 @@ export class PieceTreeBase {
 		);
 
 		updateTreeMetadata(this, prev, -1, -1);
+
 		if (prev.piece.length === 0) {
 			nodesToDel.push(prev);
 		}
@@ -1775,7 +1957,9 @@ export class PieceTreeBase {
 			line: next.piece.start.line + 1,
 			column: 0,
 		};
+
 		const newLength = next.piece.length - 1;
+
 		const newLineFeedCnt = this.getLineFeedCnt(
 			next.piece.bufferIndex,
 			newStart,
@@ -1790,6 +1974,7 @@ export class PieceTreeBase {
 		);
 
 		updateTreeMetadata(this, next, -1, -1);
+
 		if (next.piece.length === 0) {
 			nodesToDel.push(next);
 		}
@@ -1807,6 +1992,7 @@ export class PieceTreeBase {
 	adjustCarriageReturnFromNext(value: string, node: TreeNode): boolean {
 		if (this.shouldCheckCRLF() && this.endWithCR(value)) {
 			let nextNode = node.next();
+
 			if (this.startWithLF(nextNode)) {
 				// move `\n` forward
 				value += "\n";
@@ -1815,11 +2001,14 @@ export class PieceTreeBase {
 					rbDelete(this, nextNode);
 				} else {
 					const piece = nextNode.piece;
+
 					const newStart: BufferCursor = {
 						line: piece.start.line + 1,
 						column: 0,
 					};
+
 					const newLength = piece.length - 1;
+
 					const newLineFeedCnt = this.getLineFeedCnt(
 						piece.bufferIndex,
 						newStart,
@@ -1853,6 +2042,7 @@ export class PieceTreeBase {
 		}
 
 		let leftRet = this.iterate(node.left, callback);
+
 		if (!leftRet) {
 			return leftRet;
 		}
@@ -1865,19 +2055,28 @@ export class PieceTreeBase {
 			return "";
 		}
 		let buffer = this._buffers[node.piece.bufferIndex];
+
 		let currentContent;
+
 		let piece = node.piece;
+
 		let startOffset = this.offsetInBuffer(piece.bufferIndex, piece.start);
+
 		let endOffset = this.offsetInBuffer(piece.bufferIndex, piece.end);
 		currentContent = buffer.buffer.substring(startOffset, endOffset);
+
 		return currentContent;
 	}
 
 	getPieceContent(piece: Piece) {
 		let buffer = this._buffers[piece.bufferIndex];
+
 		let startOffset = this.offsetInBuffer(piece.bufferIndex, piece.start);
+
 		let endOffset = this.offsetInBuffer(piece.bufferIndex, piece.end);
+
 		let currentContent = buffer.buffer.substring(startOffset, endOffset);
+
 		return currentContent;
 	}
 
@@ -1897,6 +2096,7 @@ export class PieceTreeBase {
 		z.lf_left = 0;
 
 		let x = this.root;
+
 		if (x === SENTINEL) {
 			this.root = z;
 			z.color = NodeColor.Black;
@@ -1910,6 +2110,7 @@ export class PieceTreeBase {
 		}
 
 		fixInsert(this, z);
+
 		return z;
 	}
 
@@ -1941,6 +2142,7 @@ export class PieceTreeBase {
 		}
 
 		fixInsert(this, z);
+
 		return z;
 	}
 
@@ -1949,6 +2151,7 @@ export class PieceTreeBase {
 
 		this.iterate(node, (node) => {
 			str += this.getNodeContent(node);
+
 			return true;
 		});
 

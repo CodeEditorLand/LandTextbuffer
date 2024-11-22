@@ -134,6 +134,7 @@ export function leftRotate(tree: PieceTreeBase, x: TreeNode) {
 		y.left.parent = x;
 	}
 	y.parent = x.parent;
+
 	if (x.parent === SENTINEL) {
 		tree.root = y;
 	} else if (x.parent.left === x) {
@@ -148,6 +149,7 @@ export function leftRotate(tree: PieceTreeBase, x: TreeNode) {
 export function rightRotate(tree: PieceTreeBase, y: TreeNode) {
 	let x = y.left;
 	y.left = x.right;
+
 	if (x.right !== SENTINEL) {
 		x.right.parent = y;
 	}
@@ -171,6 +173,7 @@ export function rightRotate(tree: PieceTreeBase, y: TreeNode) {
 
 export function rbDelete(tree: PieceTreeBase, z: TreeNode) {
 	let x: TreeNode;
+
 	let y: TreeNode;
 
 	if (z.left === SENTINEL) {
@@ -249,12 +252,15 @@ export function rbDelete(tree: PieceTreeBase, z: TreeNode) {
 
 	if (x.parent.left === x) {
 		let newSizeLeft = calculateSize(x);
+
 		let newLFLeft = calculateLF(x);
+
 		if (
 			newSizeLeft !== x.parent.size_left ||
 			newLFLeft !== x.parent.lf_left
 		) {
 			let delta = newSizeLeft - x.parent.size_left;
+
 			let lf_delta = newLFLeft - x.parent.lf_left;
 			x.parent.size_left = newSizeLeft;
 			x.parent.lf_left = newLFLeft;
@@ -266,11 +272,13 @@ export function rbDelete(tree: PieceTreeBase, z: TreeNode) {
 
 	if (yWasRed) {
 		resetSentinel();
+
 		return;
 	}
 
 	// RB-DELETE-FIXUP
 	let w: TreeNode;
+
 	while (x !== tree.root && x.color === NodeColor.Black) {
 		if (x === x.parent.left) {
 			w = x.parent.right;
@@ -402,7 +410,9 @@ export function updateTreeMetadata(
 
 export function recomputeTreeMetadata(tree: PieceTreeBase, x: TreeNode) {
 	let delta = 0;
+
 	let lf_delta = 0;
+
 	if (x === tree.root) {
 		return;
 	}

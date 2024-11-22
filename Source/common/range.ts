@@ -174,8 +174,11 @@ export class Range {
 	 */
 	public static plusRange(a: IRange, b: IRange): Range {
 		let startLineNumber: number;
+
 		let startColumn: number;
+
 		let endLineNumber: number;
+
 		let endColumn: number;
 
 		if (b.startLineNumber < a.startLineNumber) {
@@ -220,12 +223,19 @@ export class Range {
 	 */
 	public static intersectRanges(a: IRange, b: IRange): Range | null {
 		let resultStartLineNumber = a.startLineNumber;
+
 		let resultStartColumn = a.startColumn;
+
 		let resultEndLineNumber = a.endLineNumber;
+
 		let resultEndColumn = a.endColumn;
+
 		let otherStartLineNumber = b.startLineNumber;
+
 		let otherStartColumn = b.startColumn;
+
 		let otherEndLineNumber = b.endLineNumber;
+
 		let otherEndColumn = b.endColumn;
 
 		if (resultStartLineNumber < otherStartLineNumber) {
@@ -464,19 +474,24 @@ export class Range {
 	): number {
 		if (a && b) {
 			const aStartLineNumber = a.startLineNumber | 0;
+
 			const bStartLineNumber = b.startLineNumber | 0;
 
 			if (aStartLineNumber === bStartLineNumber) {
 				const aStartColumn = a.startColumn | 0;
+
 				const bStartColumn = b.startColumn | 0;
 
 				if (aStartColumn === bStartColumn) {
 					const aEndLineNumber = a.endLineNumber | 0;
+
 					const bEndLineNumber = b.endLineNumber | 0;
 
 					if (aEndLineNumber === bEndLineNumber) {
 						const aEndColumn = a.endColumn | 0;
+
 						const bEndColumn = b.endColumn | 0;
+
 						return aEndColumn - bEndColumn;
 					}
 					return aEndLineNumber - bEndLineNumber;
@@ -486,7 +501,9 @@ export class Range {
 			return aStartLineNumber - bStartLineNumber;
 		}
 		const aExists = a ? 1 : 0;
+
 		const bExists = b ? 1 : 0;
+
 		return aExists - bExists;
 	}
 

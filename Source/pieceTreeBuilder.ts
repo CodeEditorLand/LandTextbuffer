@@ -40,7 +40,9 @@ export class PieceTreeTextBufferFactory {
 
 	private _getEOL(defaultEOL: DefaultEndOfLine): "\r\n" | "\n" {
 		const totalEOLCount = this._cr + this._lf + this._crlf;
+
 		const totalCRCount = this._cr + this._crlf;
+
 		if (totalEOLCount === 0) {
 			// This is an empty file or a file with precisely one line
 			return defaultEOL === DefaultEndOfLine.LF ? "\n" : "\r\n";
@@ -55,6 +57,7 @@ export class PieceTreeTextBufferFactory {
 
 	public create(defaultEOL: DefaultEndOfLine): PieceTreeBase {
 		const eol = this._getEOL(defaultEOL);
+
 		let chunks = this._chunks;
 
 		if (
@@ -65,6 +68,7 @@ export class PieceTreeTextBufferFactory {
 			// Normalize pieces
 			for (let i = 0, len = chunks.length; i < len; i++) {
 				let str = chunks[i].buffer.replace(/\r\n|\r|\n/g, eol);
+
 				let newLineStart = createLineStartsFast(str);
 				chunks[i] = new StringBuffer(str, newLineStart);
 			}
@@ -116,6 +120,7 @@ export class PieceTreeTextBufferBuilder {
 		}
 
 		const lastChar = chunk.charCodeAt(chunk.length - 1);
+
 		if (
 			lastChar === CharCode.CarriageReturn ||
 			(lastChar >= 0xd800 && lastChar <= 0xdbff)
@@ -155,6 +160,7 @@ export class PieceTreeTextBufferBuilder {
 
 	public finish(normalizeEOL: boolean = true): PieceTreeTextBufferFactory {
 		this._finish();
+
 		return new PieceTreeTextBufferFactory(
 			this.chunks,
 			this.BOM,
@@ -175,8 +181,10 @@ export class PieceTreeTextBufferBuilder {
 			// recreate last chunk
 			let lastChunk = this.chunks[this.chunks.length - 1];
 			lastChunk.buffer += String.fromCharCode(this._previousChar);
+
 			let newLineStarts = createLineStartsFast(lastChunk.buffer);
 			lastChunk.lineStarts = newLineStarts;
+
 			if (this._previousChar === CharCode.CarriageReturn) {
 				this.cr++;
 			}
