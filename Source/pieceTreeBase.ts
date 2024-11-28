@@ -21,6 +21,7 @@ export interface ITextSnapshot {
 	read(): string | null;
 }
 // const lfRegex = new RegExp(/\r\n|\r|\n/g);
+
 export const AverageBufferSize = 65535;
 
 export function createUintArray(arr: number[]): Uint32Array | Uint16Array {
