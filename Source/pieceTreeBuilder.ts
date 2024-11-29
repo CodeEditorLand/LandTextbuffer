@@ -47,6 +47,7 @@ export class PieceTreeTextBufferFactory {
 			// This is an empty file or a file with precisely one line
 			return defaultEOL === DefaultEndOfLine.LF ? "\n" : "\r\n";
 		}
+
 		if (totalCRCount > totalEOLCount / 2) {
 			// More than half of the file contains \r\n ending lines
 			return "\r\n";
@@ -70,6 +71,7 @@ export class PieceTreeTextBufferFactory {
 				let str = chunks[i].buffer.replace(/\r\n|\r|\n/g, eol);
 
 				let newLineStart = createLineStartsFast(str);
+
 				chunks[i] = new StringBuffer(str, newLineStart);
 			}
 		}
@@ -84,26 +86,36 @@ export class PieceTreeTextBufferFactory {
 
 export class PieceTreeTextBufferBuilder {
 	private readonly chunks: StringBuffer[];
+
 	private BOM: string;
 
 	private _hasPreviousChar: boolean;
+
 	private _previousChar: number;
+
 	private readonly _tmpLineStarts: number[];
 
 	private cr: number;
+
 	private lf: number;
+
 	private crlf: number;
 
 	constructor() {
 		this.chunks = [];
+
 		this.BOM = "";
 
 		this._hasPreviousChar = false;
+
 		this._previousChar = 0;
+
 		this._tmpLineStarts = [];
 
 		this.cr = 0;
+
 		this.lf = 0;
+
 		this.crlf = 0;
 	}
 
@@ -115,6 +127,7 @@ export class PieceTreeTextBufferBuilder {
 		if (this.chunks.length === 0) {
 			if (startsWithUTF8BOM(chunk)) {
 				this.BOM = UTF8_BOM_CHARACTER;
+
 				chunk = chunk.substr(1);
 			}
 		}
@@ -127,11 +140,15 @@ export class PieceTreeTextBufferBuilder {
 		) {
 			// last character is \r or a high surrogate => keep it back
 			this._acceptChunk1(chunk.substr(0, chunk.length - 1), false);
+
 			this._hasPreviousChar = true;
+
 			this._previousChar = lastChar;
 		} else {
 			this._acceptChunk1(chunk, false);
+
 			this._hasPreviousChar = false;
+
 			this._previousChar = lastChar;
 		}
 	}
@@ -153,8 +170,11 @@ export class PieceTreeTextBufferBuilder {
 		const lineStarts = createLineStarts(this._tmpLineStarts, chunk);
 
 		this.chunks.push(new StringBuffer(chunk, lineStarts.lineStarts));
+
 		this.cr += lineStarts.cr;
+
 		this.lf += lineStarts.lf;
+
 		this.crlf += lineStarts.crlf;
 	}
 
@@ -180,9 +200,11 @@ export class PieceTreeTextBufferBuilder {
 			this._hasPreviousChar = false;
 			// recreate last chunk
 			let lastChunk = this.chunks[this.chunks.length - 1];
+
 			lastChunk.buffer += String.fromCharCode(this._previousChar);
 
 			let newLineStarts = createLineStartsFast(lastChunk.buffer);
+
 			lastChunk.lineStarts = newLineStarts;
 
 			if (this._previousChar === CharCode.CarriageReturn) {
