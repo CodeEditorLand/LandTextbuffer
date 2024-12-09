@@ -1,4 +1,5 @@
 {
+	"dependencies": {},
 	"description": "The underling text buffer used in VS Code/Monaco",
 	"devDependencies": {
 		"kind-of": ">=6.0.3",
@@ -8,7 +9,7 @@
 		"yargs-parser": ">=21.1.1"
 	},
 	"main": "lib/index.js",
-	"name": "@vscode/textbuffer",
+	"name": "@codeeditorland/textbuffer",
 	"scripts": {
 		"build": "tsc",
 		"fasttest": "jest --forceExit",
