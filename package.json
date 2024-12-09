@@ -1,19 +1,19 @@
 {
-	"dependencies": {},
+	"name": "@codeeditorland/textbuffer",
 	"description": "The underling text buffer used in VS Code/Monaco",
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
+	"scripts": {
+		"build": "tsc",
+		"fasttest": "jest --forceExit",
+		"start": "npm run build && npm run watch"
+	},
+	"dependencies": {},
 	"devDependencies": {
 		"kind-of": ">=6.0.3",
 		"minimist": ">=1.2.8",
 		"node-notifier": ">=10.0.1",
 		"set-value": ">=4.1.0",
 		"yargs-parser": ">=21.1.1"
-	},
-	"main": "lib/index.js",
-	"name": "@codeeditorland/textbuffer",
-	"scripts": {
-		"build": "tsc",
-		"fasttest": "jest --forceExit",
-		"start": "npm run build && npm run watch"
-	},
-	"types": "lib/index.d.ts"
+	}
 }
