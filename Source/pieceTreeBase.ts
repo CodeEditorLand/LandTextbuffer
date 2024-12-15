@@ -1061,9 +1061,7 @@ export class PieceTreeBase {
 
 		for (
 			let node = secondNode;
-
 			node !== SENTINEL && node !== endNode;
-
 			node = node.next()
 		) {
 			nodesToDel.push(node);
